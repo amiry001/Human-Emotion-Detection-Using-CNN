@@ -1,0 +1,47 @@
+import cv2
+import numpy as np
+from PIL import Image, ImageEnhance
+from skimage.feature import hog
+
+# Define the input image path
+input_image_path = 'C:/Users/Fatima Amiri/Desktop/black/Wavelet.jpeg'
+
+# Define the output image path
+output_image_path = 'C:/Users/Fatima Amiri/Desktop/black/Waveletseg.jpg'
+
+# Define the enhancement parameters
+brightness_factor = 1.2
+contrast_factor = 1.5
+
+# Define the HOG parameters
+orientations = 9
+pixels_per_cell = (8, 8)
+cells_per_block = (2, 2)
+
+# Open the input image
+image = Image.open(input_image_path)
+
+# Apply the brightness and contrast enhancements
+enhancer = ImageEnhance.Brightness(image)
+image = enhancer.enhance(brightness_factor)
+enhancer = ImageEnhance.Contrast(image)
+image = enhancer.enhance(contrast_factor)
+
+# Convert the image to grayscale
+gray = image.convert("L")
+
+# Calculate the HOG features
+features, hog_image = hog(
+    np.array(gray),
+    orientations=orientations,
+    pixels_per_cell=pixels_per_cell,
+    cells_per_block=cells_per_block,
+    visualize=True,
+    block_norm='L2-Hys'
+)
+
+# Rescale the HOG image to 0-255 and convert to uint8
+hog_image_rescaled = (255 * hog_image / np.max(hog_image)).astype(np.uint8)
+
+# Save the HOG image
+cv2.imwrite(output_image_path, hog_image_rescaled)
